@@ -58,6 +58,7 @@ class Map extends Component {
     });
     const areaGeo = topojson.feature(data, data.objects.sa1);
     const districtGeo = topojson.feature(data, data.objects.districts);
+    const lgaGeo = topojson.feature(data, data.objects.lga);
 
     L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
@@ -68,6 +69,14 @@ class Map extends Component {
         color: '#0099ff',
         fillOpacity: 0,
         weight: 3,
+      },
+    }).addTo(map);
+
+    L.geoJson(lgaGeo, {
+      style: {
+        color: '#00ff00',
+        fillOpacity: 0,
+        weight: 2,
       },
     }).addTo(map);
 
@@ -82,7 +91,10 @@ class Map extends Component {
         layer.addEventListener('click', () => component.onLayerClick(properties.SA1, layer));
       },
       filter(feature) {
-        return feature.properties.SA1.substr(0, 3) === '310';
+        return feature.properties.SA1.substr(0, 3) === '310' ||
+          feature.properties.SA1.substr(0, 3) === '311' ||
+          feature.properties.SA1.substr(0, 3) === '312' ||
+          feature.properties.SA1.substr(0, 3) === '313';
       },
     }).addTo(map);
   }

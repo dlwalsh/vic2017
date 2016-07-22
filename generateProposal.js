@@ -20,24 +20,30 @@ async.parallel({
   const proposal = JSON.parse(results.proposal);
   const geodata = JSON.parse(results.geodata);
 
+  const features = geodata.features.reduce((memo, f) => {
+    const id = f.properties.SA1;
+    const feature = memo[id] ? merge(turf.featureCollection([memo[id], f])) : f;
+    return Object.assign(memo, {
+      [id]: feature,
+    });
+  }, {});
+
   async.map(proposal.districts, (district, cb) => {
-    const list = district.SA1.reduce((memo, pairs) => {
+    const districtFeatures = district.SA1.reduce((memo, pairs) => {
       const [start, end] = pairs;
 
       if (end) {
-        const set = _.range(start, end + 1);
+        const set = _.range(start, end + 1).map(x => features[x]);
         return [...memo, ...set];
       }
-      return [...memo, start];
-    }, []).map(x => x.toString());
+      return [...memo, features[start]];
+    }, []);
 
-    const filtered = geodata.features.filter(f => list.includes(f.properties.SA1));
-
-    const geography = merge(turf.featureCollection(filtered));
+    const geography = merge(turf.featureCollection(districtFeatures));
     const properties = {
       name: district.name,
-      current: _.sumBy(filtered, 'properties.Enrolment'),
-      future: _.sumBy(filtered, 'properties.ProjectedEnrolment'),
+      current: _.sumBy(districtFeatures, 'properties.Enrolment'),
+      future: _.sumBy(districtFeatures, 'properties.ProjectedEnrolment'),
     };
 
     cb(null, Object.assign(geography, { properties }));
