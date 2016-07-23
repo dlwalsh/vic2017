@@ -32,11 +32,17 @@ async.parallel({
     const districtFeatures = district.SA1.reduce((memo, pairs) => {
       const [start, end] = pairs;
 
-      if (end) {
-        const set = _.range(start, end + 1).map(x => features[x]);
-        return [...memo, ...set];
+      if (end && end - start >= 100) {
+        cb(`Invalid pair: ${start} ${end}`);
       }
-      return [...memo, features[start]];
+      const set = _.range(start, (end || start) + 1).map((x) => {
+        if (!features[x]) {
+          cb(`Invalid SA1: ${x}`);
+        }
+        return features[x];
+      });
+
+      return [...memo, ...set];
     }, []);
 
     const geography = merge(turf.featureCollection(districtFeatures));
@@ -44,10 +50,14 @@ async.parallel({
       name: district.name,
       current: _.sumBy(districtFeatures, 'properties.Enrolment'),
       future: _.sumBy(districtFeatures, 'properties.ProjectedEnrolment'),
+      area: Math.floor(turf.area(geography)),
     };
 
     cb(null, Object.assign(geography, { properties }));
   }, (err, data) => {
+    if (err) {
+      throw err;
+    }
     const geojson = turf.featureCollection(data);
     fs.writeFile(path.join(__dirname, 'data/proposal.geojson'), JSON.stringify(geojson));
   });

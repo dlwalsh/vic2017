@@ -41,6 +41,23 @@ class Selections extends Component {
     const totalCurrent = sumBy(entries, e => data[e] && data[e].current || 0);
     const totalProjected = sumBy(entries, e => data[e] && data[e].projected || 0);
 
+    const summary = entries
+      .map(x => parseInt(x, 10))
+      .reduce((memo, item, index, array) => {
+        if (index > 0 && item === array[index - 1] + 1) {
+          return [
+            ...memo.slice(0, memo.length - 1), [
+              memo[memo.length - 1][0],
+              item,
+            ],
+          ];
+        }
+        return [
+          ...memo,
+          [item],
+        ];
+      }, []);
+
     return (
       <div className="selections">
         <table>
@@ -94,6 +111,14 @@ class Selections extends Component {
           <button type="button" onClick={clearEntries}>
             Clear all
           </button>
+        </div>
+        <div>
+          <h3>Summary</h3>
+          <pre>
+            [{'\n'}
+            {summary.map(pair => `  [${pair.join(', ')}],\n`)}
+            ]
+          </pre>
         </div>
       </div>
     );

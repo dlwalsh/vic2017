@@ -44,7 +44,11 @@ class Proposal extends Component {
         weight: 3,
       },
       onEachFeature(feature, layer) {
-        layer.bindPopup(JSON.stringify(feature.properties))
+        layer.bindPopup(
+          Object.keys(feature.properties)
+            .map(prop => `${prop}: ${feature.properties[prop]}`)
+            .join('<br>')
+        )
           .addEventListener('popupopen', () => layer.setStyle({ fillOpacity: 0.25 }))
           .addEventListener('popupclose', () => layer.setStyle({ fillOpacity: 0 }));
       },
