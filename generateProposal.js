@@ -20,11 +20,10 @@ async.parallel({
   const proposal = JSON.parse(results.proposal);
   const geodata = JSON.parse(results.geodata);
 
-  const features = geodata.features.reduce((memo, f) => {
-    const id = f.properties.SA1;
-    const feature = memo[id] ? merge(turf.featureCollection([memo[id], f])) : f;
+  const features = geodata.features.reduce((memo, feat) => {
+    const id = feat.properties.SA1;
     return Object.assign(memo, {
-      [id]: feature,
+      [id]: memo[id] ? [...memo[id], feat] : [feat],
     });
   }, {});
 
@@ -41,8 +40,9 @@ async.parallel({
         }
         return features[x];
       });
+      const flatSet = _.flatten(set);
 
-      return [...memo, ...set];
+      return [...memo, ...flatSet];
     }, []);
 
     const geography = merge(turf.featureCollection(districtFeatures));
