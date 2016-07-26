@@ -45,13 +45,29 @@ async.parallel({
       return [...memo, ...flatSet];
     }, []);
 
-    const geography = merge(turf.featureCollection(districtFeatures));
-    const properties = {
+    let geography;
+    try {
+      geography = merge(turf.featureCollection(districtFeatures));
+    } catch (e) {
+      cb(`merge failed for ${district.name}: ${e.message}`);
+    }
+
+    console.log(`Processed ${district.name}`);
+
+    const area = turf.area(geography) / 1000000;
+    const current = _.sumBy(districtFeatures, 'properties.Enrolment');
+    const future = _.sumBy(districtFeatures, 'properties.ProjectedEnrolment');
+    const phantom = area > 100000 ? Math.floor(0.02 * area) : 0;
+
+    const properties = _.pickBy({
       name: district.name,
-      current: _.sumBy(districtFeatures, 'properties.Enrolment'),
-      future: _.sumBy(districtFeatures, 'properties.ProjectedEnrolment'),
-      area: Math.floor(turf.area(geography)),
-    };
+      current,
+      future,
+      phantom,
+      adjustedCurrent: phantom ? current + phantom : null,
+      adjustedFuture: phantom ? future + phantom : null,
+      area: Math.floor(area),
+    });
 
     cb(null, Object.assign(geography, { properties }));
   }, (err, data) => {

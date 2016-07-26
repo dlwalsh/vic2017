@@ -29,8 +29,8 @@ class Proposal extends Component {
 
   loadMap(data) {
     const map = L.map(this.mapRef, {
-      center: [-26.5, 153],
-      zoom: 11,
+      center: [-23, 150],
+      zoom: 10,
     });
 
     L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
