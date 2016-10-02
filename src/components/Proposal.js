@@ -1,6 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import React, { Component } from 'react';
+import topojson from 'topojson';
 
 class Proposal extends Component {
   constructor(...args) {
@@ -12,7 +13,8 @@ class Proposal extends Component {
   }
 
   componentDidMount() {
-    fetch('/data/proposal.geojson')
+    // fetch('//uniformswing.com/geodata/qld/redistributions/qld2016-mock.json')
+    fetch('/data/redistribution.topojson')
       .then(response => response.json())
       .then(json => this.setState({
         geodata: json,
@@ -29,19 +31,38 @@ class Proposal extends Component {
 
   loadMap(data) {
     const map = L.map(this.mapRef, {
-      center: [-23, 150],
-      zoom: 10,
+      center: [-21, 144],
+      zoom: 6,
     });
 
     L.tileLayer('http://{s}.tiles.wmflabs.org/bw-mapnik/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     }).addTo(map);
 
-    L.geoJson(data, {
+    L.geoJson(topojson.feature(data, data.objects.districts), {
+      style: {
+        color: 'red',
+        fillOpacity: 0,
+        opacity: 0.25,
+        weight: 3,
+      },
+    }).addTo(map);
+
+    L.geoJson(topojson.feature(data, data.objects.lga), {
+      style: {
+        color: 'green',
+        fillOpacity: 0,
+        opacity: 0.25,
+        weight: 2,
+      },
+    }).addTo(map);
+
+    L.geoJson(topojson.feature(data, data.objects.proposal), {
       style: {
         color: '#0066ff',
         fillOpacity: 0,
-        weight: 3,
+        opacity: 1,
+        weight: 2,
       },
       onEachFeature(feature, layer) {
         layer.bindPopup(

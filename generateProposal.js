@@ -1,6 +1,9 @@
+/* eslint no-console: 0 */
+
 const async = require('async');
 const fs = require('fs');
 const merge = require('turf-merge');
+const numeral = require('numeral');
 const path = require('path');
 const turf = require('turf');
 const _ = require('lodash');
@@ -28,6 +31,8 @@ async.parallel({
   }, {});
 
   async.map(proposal.districts, (district, cb) => {
+    console.log(`Processing ${district.name}...`);
+
     const districtFeatures = district.SA1.reduce((memo, pairs) => {
       const [start, end] = pairs;
 
@@ -37,6 +42,8 @@ async.parallel({
       const set = _.range(start, (end || start) + 1).map((x) => {
         if (!features[x]) {
           cb(`Invalid SA1: ${x}`);
+        } else {
+          features[x].count = (features[x].count || 0) + 1;
         }
         return features[x];
       });
@@ -47,12 +54,10 @@ async.parallel({
 
     let geography;
     try {
-      geography = merge(turf.featureCollection(districtFeatures));
+      geography = merge(turf.combine(turf.featureCollection(districtFeatures)));
     } catch (e) {
       cb(`merge failed for ${district.name}: ${e.message}`);
     }
-
-    console.log(`Processed ${district.name}`);
 
     const area = turf.area(geography) / 1000000;
     const current = _.sumBy(districtFeatures, 'properties.Enrolment');
@@ -60,13 +65,13 @@ async.parallel({
     const phantom = area > 100000 ? Math.floor(0.02 * area) : 0;
 
     const properties = _.pickBy({
-      name: district.name,
-      current,
-      future,
-      phantom,
-      adjustedCurrent: phantom ? current + phantom : null,
-      adjustedFuture: phantom ? future + phantom : null,
-      area: Math.floor(area),
+      Name: district.name,
+      Current: numeral(current).format('0,0'),
+      Projected: numeral(future).format('0,0'),
+      Phantom: phantom ? numeral(phantom).format('0,0') : null,
+      'Adj. Current': phantom ? numeral(current + phantom).format('0,0') : null,
+      'Adj. Projected': phantom ? numeral(future + phantom).format('0,0') : null,
+      Area: `${numeral(Math.floor(area)).format('0,0')} sq km`,
     });
 
     cb(null, Object.assign(geography, { properties }));
@@ -75,6 +80,20 @@ async.parallel({
       throw err;
     }
     const geojson = turf.featureCollection(data);
+    const missing = Object.keys(features).filter(k => !features[k].count);
+    const duplicates = Object.keys(features).filter(k => features[k].count > 1);
+    // const totalCurrent = data.reduce(d => d.properties.Current || 0, 0);
+    // const totalFuture = data.reduce(d => d.properties.Projected || 0, 0);
+
+    if (missing.length > 0) {
+      console.log('Missing SA1s\n', missing.join('\n'));
+    }
+    if (duplicates.length > 0) {
+      console.log('Duplicate SA1s\n', duplicates.join('\n'));
+    }
+    // console.log('Total current enrolment:', totalCurrent);
+    // console.log('Total projected enrolment:', totalFuture);
+
     fs.writeFile(path.join(__dirname, 'data/proposal.geojson'), JSON.stringify(geojson));
   });
 });

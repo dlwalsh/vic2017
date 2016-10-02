@@ -91,11 +91,7 @@ class Map extends Component {
         layer.addEventListener('click', () => component.onLayerClick(properties.SA1, layer));
       },
       filter(feature) {
-        return true || feature.properties.SA1.substr(0, 3) === '311' ||
-          feature.properties.SA1.substr(0, 3) === '312' ||
-          feature.properties.SA1.substr(0, 3) === '314' ||
-          feature.properties.SA1.substr(0, 3) === '315' ||
-          feature.properties.SA1.substr(0, 3) === '317';
+        return true;
       },
     }).addTo(map);
   }
