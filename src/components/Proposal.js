@@ -1,7 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import React, { Component } from 'react';
-import topojson from 'topojson';
+import * as topojson from 'topojson';
 
 class Proposal extends Component {
   constructor(...args) {
@@ -65,13 +65,15 @@ class Proposal extends Component {
         weight: 2,
       },
       onEachFeature(feature, layer) {
-        layer.bindPopup(
-          Object.keys(feature.properties)
-            .map(prop => `${prop}: ${feature.properties[prop]}`)
-            .join('<br>')
-        )
-          .addEventListener('popupopen', () => layer.setStyle({ fillOpacity: 0.25 }))
-          .addEventListener('popupclose', () => layer.setStyle({ fillOpacity: 0 }));
+        const infoStr = Object.keys(feature.properties)
+          .map(prop => `${prop}: ${feature.properties[prop]}`)
+          .join('<br>');
+
+        layer.bindPopup(infoStr).addEventListener('popupopen', () => {
+          layer.setStyle({ fillOpacity: 0.25 });
+        }).addEventListener('popupclose', () => {
+          layer.setStyle({ fillOpacity: 0 });
+        });
       },
     }).addTo(map);
   }

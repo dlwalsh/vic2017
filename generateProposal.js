@@ -2,10 +2,9 @@
 
 const async = require('async');
 const fs = require('fs');
-const merge = require('turf-merge');
+const turf = require('@turf/turf');
 const numeral = require('numeral');
 const path = require('path');
-const turf = require('turf');
 const _ = require('lodash');
 
 async.parallel({
@@ -54,9 +53,9 @@ async.parallel({
 
     let geography;
     try {
-      geography = merge(turf.combine(turf.featureCollection(districtFeatures)));
+      geography = turf.union(...districtFeatures);
     } catch (e) {
-      cb(`merge failed for ${district.name}: ${e.message}`);
+      cb(`union failed for ${district.name}: ${e.message}`);
     }
 
     const area = turf.area(geography) / 1000000;

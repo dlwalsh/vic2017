@@ -1,7 +1,7 @@
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import React, { Component, PropTypes } from 'react';
-import topojson from 'topojson';
+import * as topojson from 'topojson';
 
 const propTypes = {
   addEntry: PropTypes.func.isRequired,
