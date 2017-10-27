@@ -18,8 +18,8 @@ class SA1Calculator extends Component {
           data: json.features.reduce(
             (memo, feat) => Object.assign(memo, {
               [feat.properties.SA1]: {
-                current: feat.properties.Enrolment,
-                projected: feat.properties.ProjectedEnrolment,
+                current: feat.properties.actual,
+                projected: feat.properties.projected,
               },
             })
           , {}),

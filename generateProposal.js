@@ -23,7 +23,7 @@ async.parallel({
   const geodata = JSON.parse(results.geodata);
 
   const features = geodata.features.reduce((memo, feat) => {
-    const id = feat.properties.SA1;
+    const id = feat.properties.cd_id;
     return Object.assign(memo, {
       [id]: memo[id] ? [...memo[id], feat] : [feat],
     });
@@ -59,8 +59,8 @@ async.parallel({
     }
 
     const area = turf.area(geography) / 1000000;
-    const current = _.sumBy(districtFeatures, 'properties.Enrolment');
-    const future = _.sumBy(districtFeatures, 'properties.ProjectedEnrolment');
+    const current = _.sumBy(districtFeatures, 'properties.actual');
+    const future = _.sumBy(districtFeatures, 'properties.projected');
     const phantom = area > 100000 ? Math.floor(0.02 * area) : 0;
 
     const properties = _.pickBy({

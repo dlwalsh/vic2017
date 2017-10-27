@@ -22,10 +22,10 @@ class Selections extends Component {
         this.setState({
           data: json.features.reduce(
             (memo, feat) => Object.assign(memo, {
-              [feat.properties.SA1]: {
-                current: feat.properties.Enrolment,
-                district: feat.properties.DistrictId,
-                projected: feat.properties.ProjectedEnrolment,
+              [feat.properties.cd_id]: {
+                current: feat.properties.actual,
+                district: feat.properties.elect_div,
+                projected: feat.properties.projected,
               },
             })
           , {}),

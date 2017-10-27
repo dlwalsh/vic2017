@@ -40,7 +40,6 @@ class Enrolment extends Component {
         <table className="figures-table">
           <thead>
             <tr>
-              <th></th>
               <th>District</th>
               <th>Current</th>
               <th>+/-</th>
@@ -52,7 +51,6 @@ class Enrolment extends Component {
           <tbody>
             {data.map(item => (
               <tr key={item.id}>
-                <td style={{ textAlign: 'right' }}>{item.id}.</td>
                 <td>{item.name}</td>
                 <td style={{ textAlign: 'right' }}>
                   {numeral(item.current).format('0,0')}

@@ -19,7 +19,7 @@ class Map extends Component {
   }
 
   componentDidMount() {
-    fetch('/data/qld.topojson')
+    fetch('/data/vic.topojson')
       .then(response => response.json())
       .then(json => this.setState({
         geodata: json,
@@ -53,8 +53,8 @@ class Map extends Component {
   loadMap(data) {
     const component = this;
     const map = L.map(this.mapRef, {
-      center: [-21, 144],
-      zoom: 6,
+      center: [-37, 145],
+      zoom: 7,
     });
     const areaGeo = topojson.feature(data, data.objects.sa1);
     const districtGeo = topojson.feature(data, data.objects.districts);
@@ -88,7 +88,7 @@ class Map extends Component {
       },
       onEachFeature(feature, layer) {
         const { properties } = feature;
-        layer.addEventListener('click', () => component.onLayerClick(properties.SA1, layer));
+        layer.addEventListener('click', () => component.onLayerClick(properties.cd_id, layer));
       },
       filter(feature) {
         return true;

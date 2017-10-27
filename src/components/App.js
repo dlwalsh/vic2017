@@ -12,10 +12,9 @@ class App extends Component {
   }
 
   addEntry(entry) {
-    const { entries } = this.state;
-    this.setState({
-      entries: [...entries, entry].sort(),
-    });
+    this.setState(state => ({
+      entries: [...state.entries, entry].sort(),
+    }));
   }
 
   clearEntries() {
@@ -25,10 +24,9 @@ class App extends Component {
   }
 
   removeEntry(entry) {
-    const { entries } = this.state;
-    this.setState({
-      entries: entries.filter(e => e !== entry),
-    });
+    this.setState(state => ({
+      entries: state.entries.filter(e => e !== entry),
+    }));
   }
 
   render() {
