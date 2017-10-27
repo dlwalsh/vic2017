@@ -93,6 +93,13 @@ async.parallel({
     // console.log('Total current enrolment:', totalCurrent);
     // console.log('Total projected enrolment:', totalFuture);
 
-    fs.writeFile(path.join(__dirname, 'data/proposal.geojson'), JSON.stringify(geojson));
+    const outFileName = path.join(__dirname, 'data/proposal.geojson');
+    fs.writeFile(outFileName, JSON.stringify(geojson), (writeError) => {
+      if (writeError) {
+        console.error(writeError);
+      } else {
+        console.log('Contents written to', outFileName);
+      }
+    });
   });
 });
