@@ -61,15 +61,11 @@ async.parallel({
     const area = turf.area(geography) / 1000000;
     const current = _.sumBy(districtFeatures, 'properties.actual');
     const future = _.sumBy(districtFeatures, 'properties.projected');
-    const phantom = area > 100000 ? Math.floor(0.02 * area) : 0;
 
     const properties = _.pickBy({
       Name: district.name,
       Current: numeral(current).format('0,0'),
       Projected: numeral(future).format('0,0'),
-      Phantom: phantom ? numeral(phantom).format('0,0') : null,
-      'Adj. Current': phantom ? numeral(current + phantom).format('0,0') : null,
-      'Adj. Projected': phantom ? numeral(future + phantom).format('0,0') : null,
       Area: `${numeral(Math.floor(area)).format('0,0')} sq km`,
     });
 
